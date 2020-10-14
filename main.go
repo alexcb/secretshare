@@ -169,30 +169,40 @@ func genOrLoadKeys() (string, string, error) {
 
 func main() {
 	test()
-	if len(os.Args) > 1 {
-		encryptMain(os.Args[1])
+	pub, priv, err := genOrLoadKeys()
+	pub = strings.TrimPrefix(pub, "ssh-rsa ")
+
+	if len(os.Args) <= 1 {
+		appName := "secret-share"
+		if len(os.Args) > 0 {
+			appName = os.Args[0]
+		}
+		fmt.Printf("To decrypt data, run: %s decrypt < file_to_decrypt\n", appName)
+		fmt.Printf("To encrypt data, run: %s <encryption_key> < data_to_encrypt\n", appName)
+		fmt.Printf("\n")
+		fmt.Printf("For example if someone wanted to send you data, they would run:\n%s %s < data_to_encrypt\n", appName, pub)
 		return
 	}
 
-	pub, priv, err := genOrLoadKeys()
+	arg := os.Args[1]
+
+	data, err := ioutil.ReadAll(os.Stdin)
 	if err != nil {
 		panic(err)
 	}
-	pub = strings.TrimPrefix(pub, "ssh-rsa ")
 
-	fmt.Printf("run this command to encrypt data: %s %s\n", os.Args[0], pub)
-
-	for {
-		data := promptLine("enter encrypted data")
-		data2, err := decrypt(data, priv)
+	if arg == "decrypt" {
+		data2, err := decrypt(string(data), priv)
 		if err != nil {
-			fmt.Printf("failed to decrypt: %v\n", err)
-			continue
+			panic(err)
 		}
-		fmt.Println("")
-		fmt.Println("-- start of message --")
 		fmt.Println(data2)
-		fmt.Println("-- end of message --")
-		fmt.Println("press ctrl-c to quit, or continue decoding more messages.")
+		return
 	}
+
+	encrypted, err := encrypt(string(data), "ssh-rsa "+arg)
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println(encrypted)
 }

@@ -54,13 +54,14 @@ secretshare:
     FROM +code
     ARG GOOS=linux
     ARG GOARCH=amd64
+    ARG GO_EXTRA_LDFLAGS="-linkmode external -extldflags -static"
     RUN test -n "$GOOS" && test -n "$GOARCH"
     ARG GOCACHE=/go-cache
     RUN mkdir -p build
     RUN --mount=type=cache,target=$GOCACHE \
         go build \
             -o build/secretshare \
-            -ldflags "-linkmode external -extldflags -static" \
+            -ldflags "$GO_EXTRA_LDFLAGS" \
             main.go
     SAVE ARTIFACT build/secretshare AS LOCAL "build/$GOOS/$GOARCH/secretshare"
 

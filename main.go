@@ -2,8 +2,6 @@ package main
 
 import (
 	"bufio"
-	//"bytes"
-	//"context"
 	"crypto/rand"
 	"crypto/rsa"
 	"crypto/sha256"
@@ -11,15 +9,8 @@ import (
 	"encoding/base64"
 	"encoding/pem"
 	"fmt"
-	"strings"
-	//"io"
-	//"io/ioutil"
-	//mrand "math/rand"
-	//"net/http"
-	//"net/http/httptest"
 	"os"
-	//"strings"
-	//"time"
+	"strings"
 
 	"golang.org/x/crypto/ssh"
 )
@@ -151,12 +142,4 @@ func main() {
 		panic(err)
 	}
 	fmt.Println(data2)
-
-	//fmt.Printf("%v %v\n", pub, priv)
-	//msg := "hello"
-	//out, err := encrypt(msg, pub)
-	//if err != nil {
-	//	panic(err)
-	//}
-	//fmt.Printf("%v\n", out)
 }

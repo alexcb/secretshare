@@ -23,7 +23,7 @@ Bob replies to Alice and tells her she can send him data using:
 
 Alice then runs the command:
 
-    echo "Here's your new password. Dont share it with anyone. I hope nobody decrypts this message. anyway it's "querty". Have fun." | ./build/linux/amd64/secretshare AAAAB3NzaC1yc2EAAAADAQABAAABAQCkSAXQqyy+99uJGaYy6dBVNITdTrYeNewigGhx6/SrPppJX7KLPo6qSI8vP/ej8VDiFJGB4FjbiCLarkn1X1e1F4GW7CkjylUmD1X7njl6EeuZSzqvzsWoyO3Pgwa94d/mkQNvfvGyC9FopJh0pdVbLcPuyX75Tc6SmD8jq9PifoyC3nX2qeUOSZMgjbADpsIGABENaaDs1gTeRp2KwYHG2UwxnAUNKoANFIUK1McAL37xSJJ32pY4vEtlYxzhu2Rji7fUvQB4gqWhKuoOOoP1aP4zcOSPORMyZyPOPLT3SiVnW4GI10j0p73Y/aoYeg0eRUvhKB8WDRwOXIldgWrv
+    echo 'Here's your new password. Dont share it with anyone. I hope nobody decrypts this message. anyway it's "querty". Have fun.' | ./build/linux/amd64/secretshare AAAAB3NzaC1yc2EAAAADAQABAAABAQCkSAXQqyy+99uJGaYy6dBVNITdTrYeNewigGhx6/SrPppJX7KLPo6qSI8vP/ej8VDiFJGB4FjbiCLarkn1X1e1F4GW7CkjylUmD1X7njl6EeuZSzqvzsWoyO3Pgwa94d/mkQNvfvGyC9FopJh0pdVbLcPuyX75Tc6SmD8jq9PifoyC3nX2qeUOSZMgjbADpsIGABENaaDs1gTeRp2KwYHG2UwxnAUNKoANFIUK1McAL37xSJJ32pY4vEtlYxzhu2Rji7fUvQB4gqWhKuoOOoP1aP4zcOSPORMyZyPOPLT3SiVnW4GI10j0p73Y/aoYeg0eRUvhKB8WDRwOXIldgWrv
 
 Which outputs:
 
@@ -36,4 +36,4 @@ She sends this encrypted data to Bob, who runs the following command to decrypt 
 
 Which outputs:
 
-    Here's your new password. Dont share it with anyone. I hope nobody decrypts this message. anyway it's querty. Have fun.
+    Here's your new password. Dont share it with anyone. I hope nobody decrypts this message. anyway it's "querty". Have fun.

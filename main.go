@@ -9,7 +9,9 @@ import (
 	"encoding/base64"
 	"encoding/pem"
 	"fmt"
+	"io/ioutil"
 	"os"
+	"path/filepath"
 	"strings"
 
 	"golang.org/x/crypto/ssh"
@@ -123,6 +125,48 @@ func test() {
 	}
 }
 
+func fileExists(filename string) bool {
+	info, err := os.Stat(filename)
+	if os.IsNotExist(err) {
+		return false
+	}
+	return !info.IsDir()
+}
+
+func genOrLoadKeys() (string, string, error) {
+
+	homeDir, err := os.UserHomeDir()
+	if err != nil {
+		return "", "", err
+	}
+
+	privKeyPath := filepath.Join(homeDir, ".secretshare")
+	pubKeyPath := filepath.Join(homeDir, ".secretshare.pub")
+
+	if !fileExists(privKeyPath) {
+		pub, priv := generateKey()
+		err := ioutil.WriteFile(privKeyPath, []byte(priv), 0600)
+		if err != nil {
+			return "", "", err
+		}
+		err = ioutil.WriteFile(pubKeyPath, []byte(pub), 0644)
+		if err != nil {
+			return "", "", err
+		}
+	}
+
+	priv, err := ioutil.ReadFile(privKeyPath)
+	if err != nil {
+		return "", "", err
+	}
+	pub, err := ioutil.ReadFile(pubKeyPath)
+	if err != nil {
+		return "", "", err
+	}
+
+	return string(pub), string(priv), nil
+}
+
 func main() {
 	test()
 	if len(os.Args) > 1 {
@@ -130,7 +174,10 @@ func main() {
 		return
 	}
 
-	pub, priv := generateKey()
+	pub, priv, err := genOrLoadKeys()
+	if err != nil {
+		panic(err)
+	}
 	pub = strings.TrimPrefix(pub, "ssh-rsa ")
 
 	fmt.Printf("run this command to encrypt data: %s %s\n", os.Args[0], pub)

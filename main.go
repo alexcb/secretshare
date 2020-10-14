@@ -135,11 +135,17 @@ func main() {
 
 	fmt.Printf("run this command to encrypt data: %s %s\n", os.Args[0], pub)
 
-	data := promptLine("enter encrypted data")
-
-	data2, err := decrypt(data, priv)
-	if err != nil {
-		panic(err)
+	for {
+		data := promptLine("enter encrypted data")
+		data2, err := decrypt(data, priv)
+		if err != nil {
+			fmt.Printf("failed to decrypt: %v\n", err)
+			continue
+		}
+		fmt.Println("")
+		fmt.Println("-- start of message --")
+		fmt.Println(data2)
+		fmt.Println("-- end of message --")
+		fmt.Println("press ctrl-c to quit, or continue decoding more messages.")
 	}
-	fmt.Println(data2)
 }

@@ -50,7 +50,7 @@ first download the [earth](https://github.com/earthly/earthly) command, then run
 
     earth +secretshare-all
 
-which will produce binary files under ./build/<platform>/amd64/secretshare
+which will produce binary files under `./build/<platform>/amd64/secretshare`
 
 ### Preview
 

@@ -170,6 +170,9 @@ func genOrLoadKeys() (string, string, error) {
 func main() {
 	test()
 	pub, priv, err := genOrLoadKeys()
+	if err != nil {
+		panic(err)
+	}
 	pub = strings.TrimPrefix(pub, "ssh-rsa ")
 
 	if len(os.Args) <= 1 {

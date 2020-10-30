@@ -35,3 +35,12 @@ Alice can then safely send this data back to you, and only you can decrypt it, b
 Which will output the original message:
 
     Hi Bob, your new password is "querty".
+
+## Building from Source
+
+secretshare makes use of the [Earthly](https://www.earthly.dev/) build system. To build from source,
+first download the [earth](https://github.com/earthly/earthly) command, then run:
+
+    earth +secretshare-all
+
+which will produce binary files under ./build/<platform>/amd64/secretshare

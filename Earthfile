@@ -52,9 +52,9 @@ lint:
 
 secretshare:
     FROM +code
-    ARG GOOS=linux
-    ARG GOARCH=amd64
-    ARG GO_EXTRA_LDFLAGS="-linkmode external -extldflags -static"
+    ARG GOOS
+    ARG GO_EXTRA_LDFLAGS
+    ARG GOARCH
     RUN test -n "$GOOS" && test -n "$GOARCH"
     ARG GOCACHE=/go-cache
     RUN mkdir -p build
@@ -73,8 +73,16 @@ secretshare-darwin:
         +secretshare/* ./
     SAVE ARTIFACT ./*
 
+secretshare-linux:
+    COPY \
+        --build-arg GOOS=linux \
+        --build-arg GOARCH=amd64 \
+        --build-arg GO_EXTRA_LDFLAGS="-linkmode external -extldflags -static" \
+        +secretshare/* ./
+    SAVE ARTIFACT ./*
+
 secretshare-all:
-    COPY +secretshare/secretshare ./secretshare-linux-amd64
+    COPY +secretshare-linux/secretshare ./secretshare-linux-amd64
     COPY +secretshare-darwin/secretshare ./secretshare-darwin-amd64
     SAVE ARTIFACT ./*
 

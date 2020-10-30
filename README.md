@@ -36,6 +36,12 @@ Which will output the original message:
 
     Hi Bob, your new password is "querty".
 
+## Under the hood
+
+Under the hood `secretshare` will generate a private and public key stored under ~/.secretshare and ~/.secretshare.pub respectively. The public key is what is used by alice to encrypt data that can only be decrypted using the private key. If we `cat ~/.secretshare.pub`, we can see the same data is sent in the above usage example:
+
+    ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCagdQYuPXgzyfg2k58CYTntkSo2rI9QtZWYnk45n6oZGW8wGUoqrmCeLCbCo7HG6JJD+jUuWx9ELmC2rRINQnhJdBdwbMlOx8v7oSr60xR8b0pYRL1gm6DseU0u/pClBfGcwV7tsxuRspk/c3/cpYOFcs2vN5mXo29qSpg1w4iE3snoAOQGajN1U4sT3rht5hjx188d9MxuBTnqd0yW7RQMSS8YqdszaAiwUQ2rtwMKDUp5CT+5LZ/QW/EMexRSEfgkjGGmz+NlBAhGDTrBByw2Dl+6pZESAtxmCaZ6vzG+CSqH5oQVXVl/A9YEQiuDVGdxcfF3jYmlYIfISeMtRTj
+
 
 ## Building from Source
 

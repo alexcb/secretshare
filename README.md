@@ -36,6 +36,7 @@ Which will output the original message:
 
     Hi Bob, your new password is "querty".
 
+
 ## Building from Source
 
 secretshare makes use of the [Earthly](https://www.earthly.dev/) build system. To build from source,
@@ -44,3 +45,8 @@ first download the [earth](https://github.com/earthly/earthly) command, then run
     earth +secretshare-all
 
 which will produce binary files under ./build/<platform>/amd64/secretshare
+
+### Preview
+
+[![asciicast](preview.gif)](https://asciinema.org/a/369195?&speed=2)
+

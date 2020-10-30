@@ -1,39 +1,37 @@
-Share secrets using rsa public/private encryption.
+# Share secrets using rsa public/private encryption.
 
-Usage:
+## Installation
 
-Alice has a secret message to send to Bob. Alice pings bob on slack and says hey bob I need to send you a secret.
-Bob has a ssh key installed, but can't remember how to use gpg on the command line. Instead bob uses this sharesecret tool.
+### Linux
 
-Bob opens a terminal and runs:
+    sudo /bin/sh -c 'wget https://github.com/alexcb/secretshare/releases/latest/download/secretshare-linux-amd64 -O /usr/local/bin/secretshare && chmod +x /usr/local/bin/secretshare'
 
-    ./build/linux/amd64/secretshare
+### MacOS
 
-It prints out the following message:
+    sudo /bin/sh -c 'wget https://github.com/alexcb/secretshare/releases/latest/download/secretshare-darwin-amd64 -O /usr/local/bin/secretshare && chmod +x /usr/local/bin/secretshare'
 
-    To decrypt data, run: ./build/linux/amd64/secretshare decrypt < file_to_decrypt
-    To encrypt data, run: ./build/linux/amd64/secretshare <encryption_key> < data_to_encrypt
-    
-    For example if someone wanted to send you data, they would run:
-    ./build/linux/amd64/secretshare AAAAB3NzaC1yc2EAAAADAQABAAABAQCkSAXQqyy+99uJGaYy6dBVNITdTrYeNewigGhx6/SrPppJX7KLPo6qSI8vP/ej8VDiFJGB4FjbiCLarkn1X1e1F4GW7CkjylUmD1X7njl6EeuZSzqvzsWoyO3Pgwa94d/mkQNvfvGyC9FopJh0pdVbLcPuyX75Tc6SmD8jq9PifoyC3nX2qeUOSZMgjbADpsIGABENaaDs1gTeRp2KwYHG2UwxnAUNKoANFIUK1McAL37xSJJ32pY4vEtlYxzhu2Rji7fUvQB4gqWhKuoOOoP1aP4zcOSPORMyZyPOPLT3SiVnW4GI10j0p73Y/aoYeg0eRUvhKB8WDRwOXIldgWrv
+### Usage
 
-Bob replies to Alice and tells her she can send him data using:
+Suppose you want to receive some data from Alice, first you must run `secretshare` locally:
 
-    ./build/linux/amd64/secretshare AAAAB3NzaC1yc2EAAAADAQABAAABAQCkSAXQqyy+99uJGaYy6dBVNITdTrYeNewigGhx6/SrPppJX7KLPo6qSI8vP/ej8VDiFJGB4FjbiCLarkn1X1e1F4GW7CkjylUmD1X7njl6EeuZSzqvzsWoyO3Pgwa94d/mkQNvfvGyC9FopJh0pdVbLcPuyX75Tc6SmD8jq9PifoyC3nX2qeUOSZMgjbADpsIGABENaaDs1gTeRp2KwYHG2UwxnAUNKoANFIUK1McAL37xSJJ32pY4vEtlYxzhu2Rji7fUvQB4gqWhKuoOOoP1aP4zcOSPORMyZyPOPLT3SiVnW4GI10j0p73Y/aoYeg0eRUvhKB8WDRwOXIldgWrv
+    secretshare
 
-Alice then runs the command:
+This will print out something like:
 
-    echo 'Here's your new password. Dont share it with anyone. I hope nobody decrypts this message. anyway it's "querty". Have fun.' | ./build/linux/amd64/secretshare AAAAB3NzaC1yc2EAAAADAQABAAABAQCkSAXQqyy+99uJGaYy6dBVNITdTrYeNewigGhx6/SrPppJX7KLPo6qSI8vP/ej8VDiFJGB4FjbiCLarkn1X1e1F4GW7CkjylUmD1X7njl6EeuZSzqvzsWoyO3Pgwa94d/mkQNvfvGyC9FopJh0pdVbLcPuyX75Tc6SmD8jq9PifoyC3nX2qeUOSZMgjbADpsIGABENaaDs1gTeRp2KwYHG2UwxnAUNKoANFIUK1McAL37xSJJ32pY4vEtlYxzhu2Rji7fUvQB4gqWhKuoOOoP1aP4zcOSPORMyZyPOPLT3SiVnW4GI10j0p73Y/aoYeg0eRUvhKB8WDRwOXIldgWrv
+    secretshare AAAAB3NzaC1yc2EAAAADAQABAAABAQCagdQYuPXgzyfg2k58CYTntkSo2rI9QtZWYnk45n6oZGW8wGUoqrmCeLCbCo7HG6JJD+jUuWx9ELmC2rRINQnhJdBdwbMlOx8v7oSr60xR8b0pYRL1gm6DseU0u/pClBfGcwV7tsxuRspk/c3/cpYOFcs2vN5mXo29qSpg1w4iE3snoAOQGajN1U4sT3rht5hjx188d9MxuBTnqd0yW7RQMSS8YqdszaAiwUQ2rtwMKDUp5CT+5LZ/QW/EMexRSEfgkjGGmz+NlBAhGDTrBByw2Dl+6pZESAtxmCaZ6vzG+CSqH5oQVXVl/A9YEQiuDVGdxcfF3jYmlYIfISeMtRTj < data_to_send
 
-Which outputs:
+This output can safely be sent to alice. Alice will then run something like:
 
-    DpNw53fz1c2TUVwXTO/K2w5CYPvARTVzjzQb/9Rdt8+lW7tfFy8t9BWqdwN2vq7lwMjkqmKxJIKDhc8OwMh+TkMrmC4Q0Qr146td9E9vu+XV5LyBD7OlYXqFo0edE9QmyrRCcG9teV3XuLpmO7XgnenYnyOTySepjHX1rZgff6VVGn1dWtHLKk32H6D39q+HkY+8k+cTUgXwWe3rJTcjipXJAsDmH9/DoPJcCwH/Rc/9mz+zJW9YEiASuxl37e639erSFY3JwTTTOfnBzOoS4pWJPQtpCNdx77RXlSbNPyx+CgBMLpx5/QgqyLcBe0mWf2pA17eYHN3Z6gDt3Wsavg==
+    echo 'Hi Bob, your new password is "querty".' | secretshare AAAAB3NzaC1yc2EAAAADAQABAAABAQCagdQYuPXgzyfg2k58CYTntkSo2rI9QtZWYnk45n6oZGW8wGUoqrmCeLCbCo7HG6JJD+jUuWx9ELmC2rRINQnhJdBdwbMlOx8v7oSr60xR8b0pYRL1gm6DseU0u/pClBfGcwV7tsxuRspk/c3/cpYOFcs2vN5mXo29qSpg1w4iE3snoAOQGajN1U4sT3rht5hjx188d9MxuBTnqd0yW7RQMSS8YqdszaAiwUQ2rtwMKDUp5CT+5LZ/QW/EMexRSEfgkjGGmz+NlBAhGDTrBByw2Dl+6pZESAtxmCaZ6vzG+CSqH5oQVXVl/A9YEQiuDVGdxcfF3jYmlYIfISeMtRTj
 
-She sends this encrypted data to Bob, who runs the following command to decrypt it:
+This will output something like
 
+    gevonaUXKj7Wmct65A8yVJWTp9D/sd6YbOCi4BtrKGeUjdWs/fa0BbP0IQhdP2j4fS6n12zGmgkOXHLJyJnG9OPxZ+EaPcIfVBs5TfvNnC/8Dfu+V5ScRIYXBHVjRsDOBQCYzeOSwFvq1vUyuq20Wr7s3szbgFkDttxPsaXMKyxTcVEqkgSp09dhV7roqBmsRUDbAFpIWLIUb4ZAtCfU6rbWaAes9acSmMT3fvW/no1gsa3/Wobdpj3T7WVrQsj+upr2ANlFyA3Bt7IOKxmJhrrRYOBxAkk6NEnYmrHWR26KGRhz/VRPxAZWsB/qMoVAw5ukjnVple2+x8SMrIE9Gg==
 
-    echo "DpNw53fz1c2TUVwXTO/K2w5CYPvARTVzjzQb/9Rdt8+lW7tfFy8t9BWqdwN2vq7lwMjkqmKxJIKDhc8OwMh+TkMrmC4Q0Qr146td9E9vu+XV5LyBD7OlYXqFo0edE9QmyrRCcG9teV3XuLpmO7XgnenYnyOTySepjHX1rZgff6VVGn1dWtHLKk32H6D39q+HkY+8k+cTUgXwWe3rJTcjipXJAsDmH9/DoPJcCwH/Rc/9mz+zJW9YEiASuxl37e639erSFY3JwTTTOfnBzOoS4pWJPQtpCNdx77RXlSbNPyx+CgBMLpx5/QgqyLcBe0mWf2pA17eYHN3Z6gDt3Wsavg==" | ./build/linux/amd64/secretshare decrypt
+Alice can then safely send this data back to you, and only you can decrypt it, but running this command:
 
-Which outputs:
+    echo "gevonaUXKj7Wmct65A8yVJWTp9D/sd6YbOCi4BtrKGeUjdWs/fa0BbP0IQhdP2j4fS6n12zGmgkOXHLJyJnG9OPxZ+EaPcIfVBs5TfvNnC/8Dfu+V5ScRIYXBHVjRsDOBQCYzeOSwFvq1vUyuq20Wr7s3szbgFkDttxPsaXMKyxTcVEqkgSp09dhV7roqBmsRUDbAFpIWLIUb4ZAtCfU6rbWaAes9acSmMT3fvW/no1gsa3/Wobdpj3T7WVrQsj+upr2ANlFyA3Bt7IOKxmJhrrRYOBxAkk6NEnYmrHWR26KGRhz/VRPxAZWsB/qMoVAw5ukjnVple2+x8SMrIE9Gg==" | secretshare decrypt
 
-    Here's your new password. Dont share it with anyone. I hope nobody decrypts this message. anyway it's "querty". Have fun.
+Which will output the original message:
+
+    Hi Bob, your new password is "querty".

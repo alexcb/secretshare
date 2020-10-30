@@ -22,13 +22,13 @@ WORKDIR /secretshare
 deps:
     RUN go get golang.org/x/tools/cmd/goimports
     RUN go get golang.org/x/lint/golint
-    RUN go get golang.org/x/crypto/ssh
-    RUN go get github.com/gordonklaus/ineffassign
+    COPY go.mod go.sum .
+	RUN go mod download
     SAVE IMAGE
 
 code:
     FROM +deps
-    COPY main.go ./
+    COPY --dir cmd ./
     SAVE IMAGE
 
 lint:
@@ -62,7 +62,7 @@ secretshare:
         go build \
             -o build/secretshare \
             -ldflags "$GO_EXTRA_LDFLAGS" \
-            main.go
+            cmd/secretshare/main.go
     SAVE ARTIFACT build/secretshare AS LOCAL "build/$GOOS/$GOARCH/secretshare"
 
 secretshare-darwin:
@@ -78,3 +78,23 @@ secretshare-all:
     COPY +secretshare-darwin/secretshare ./secretshare-darwin-amd64
     SAVE ARTIFACT ./*
 
+release:
+    FROM node:13.10.1-alpine3.11
+    RUN npm install -g github-release-cli@v1.3.1
+    WORKDIR /release
+    COPY +secretshare/secretshare ./secretshare-linux-amd64
+    COPY +secretshare-darwin/secretshare ./secretshare-darwin-amd64
+    ARG RELEASE_TAG
+    ARG EARTHLY_GIT_HASH
+    ARG BODY="No details provided"
+    RUN --secret GITHUB_TOKEN=+secrets/GITHUB_TOKEN test -n "$GITHUB_TOKEN"
+    RUN --push \
+        --secret GITHUB_TOKEN=+secrets/GITHUB_TOKEN \
+        github-release upload \
+        --owner alexcb \
+        --repo secret-share \
+        --commitish "$EARTHLY_GIT_HASH" \
+        --tag "$RELEASE_TAG" \
+        --name "$RELEASE_TAG" \
+        --body "$BODY" \
+        ./secretshare-*

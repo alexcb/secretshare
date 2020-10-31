@@ -90,7 +90,7 @@ release:
     FROM node:13.10.1-alpine3.11
     RUN npm install -g github-release-cli@v1.3.1
     WORKDIR /release
-    COPY +secretshare/secretshare ./secretshare-linux-amd64
+    COPY +secretshare-linux/secretshare ./secretshare-linux-amd64
     COPY +secretshare-darwin/secretshare ./secretshare-darwin-amd64
     ARG RELEASE_TAG
     ARG EARTHLY_GIT_HASH

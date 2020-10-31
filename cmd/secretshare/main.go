@@ -1,7 +1,6 @@
 package main
 
 import (
-	"bufio"
 	"crypto/rand"
 	"crypto/rsa"
 	"crypto/sha256"
@@ -23,23 +22,23 @@ func marshalRSAPrivate(priv *rsa.PrivateKey) string {
 	}))
 }
 
-func generateKey() (string, string) {
+func generateKey() (string, string, error) {
 	reader := rand.Reader
 	bitSize := 2048
 
 	key, err := rsa.GenerateKey(reader, bitSize)
 	if err != nil {
-		panic(err)
+		return "", "", err
 	}
 
 	pub, err := ssh.NewPublicKey(key.Public())
 	if err != nil {
-		panic(err)
+		return "", "", err
 	}
 	pubKeyStr := string(ssh.MarshalAuthorizedKey(pub))
 	privKeyStr := marshalRSAPrivate(key)
 
-	return pubKeyStr, privKeyStr
+	return pubKeyStr, privKeyStr, nil
 }
 
 func encrypt(msg, publicKey string) (string, error) {
@@ -69,13 +68,6 @@ func encrypt(msg, publicKey string) (string, error) {
 	return base64.StdEncoding.EncodeToString(encryptedBytes), nil
 }
 
-func promptLine(msg string) string {
-	fmt.Println(msg)
-	reader := bufio.NewReader(os.Stdin)
-	s, _ := reader.ReadString('\n')
-	return s
-}
-
 func decrypt(data, priv string) (string, error) {
 	data2, err := base64.StdEncoding.DecodeString(data)
 	if err != nil {
@@ -95,18 +87,11 @@ func decrypt(data, priv string) (string, error) {
 	return string(decrypted), nil
 }
 
-func encryptMain(pub string) {
-	data := promptLine("enter data to encrypt")
-	encrypted, err := encrypt(data, "ssh-rsa "+pub)
+func test() {
+	pub, priv, err := generateKey()
 	if err != nil {
 		panic(err)
 	}
-	fmt.Printf("--- Below is the encrypted data ---\n")
-	fmt.Println(encrypted)
-}
-
-func test() {
-	pub, priv := generateKey()
 	pub = strings.TrimPrefix(pub, "ssh-rsa ")
 
 	data := "hello test"
@@ -134,7 +119,6 @@ func fileExists(filename string) bool {
 }
 
 func genOrLoadKeys() (string, string, error) {
-
 	homeDir, err := os.UserHomeDir()
 	if err != nil {
 		return "", "", err
@@ -144,8 +128,11 @@ func genOrLoadKeys() (string, string, error) {
 	pubKeyPath := filepath.Join(homeDir, ".secretshare.pub")
 
 	if !fileExists(privKeyPath) {
-		pub, priv := generateKey()
-		err := ioutil.WriteFile(privKeyPath, []byte(priv), 0600)
+		pub, priv, err := generateKey()
+		if err != nil {
+			return "", "", err
+		}
+		err = ioutil.WriteFile(privKeyPath, []byte(priv), 0600)
 		if err != nil {
 			return "", "", err
 		}
@@ -191,13 +178,15 @@ func main() {
 
 	data, err := ioutil.ReadAll(os.Stdin)
 	if err != nil {
-		panic(err)
+		fmt.Fprintf(os.Stderr, "failed while reading from stdin: %s", err.Error())
+		os.Exit(1)
 	}
 
 	if arg == "decrypt" {
 		data2, err := decrypt(string(data), priv)
 		if err != nil {
-			panic(err)
+			fmt.Fprintf(os.Stderr, "failed while decrypting: %s", err.Error())
+			os.Exit(1)
 		}
 		fmt.Println(data2)
 		return
@@ -205,7 +194,8 @@ func main() {
 
 	encrypted, err := encrypt(string(data), "ssh-rsa "+arg)
 	if err != nil {
-		panic(err)
+		fmt.Fprintf(os.Stderr, "failed while encrypting: %s", err.Error())
+		os.Exit(1)
 	}
 	fmt.Println(encrypted)
 }

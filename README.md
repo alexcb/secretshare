@@ -52,6 +52,12 @@ first download the [earth](https://github.com/earthly/earthly) command, then run
 
 which will produce binary files under `./build/<platform>/amd64/secretshare`
 
+### Release
+
+To release a new version, run the following command:
+
+    RELEASE_TAG=v0.0.2 earth --build-arg RELEASE_TAG --secret GITHUB_TOKEN --push +release
+
 ### Preview
 
 [![asciicast](preview.gif)](https://asciinema.org/a/369195?&speed=2)

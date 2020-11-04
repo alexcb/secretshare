@@ -188,7 +188,7 @@ func main() {
 			fmt.Fprintf(os.Stderr, "failed while decrypting: %s", err.Error())
 			os.Exit(1)
 		}
-		fmt.Println(data2)
+		fmt.Printf("%s", data2)
 		return
 	}
 
@@ -197,5 +197,5 @@ func main() {
 		fmt.Fprintf(os.Stderr, "failed while encrypting: %s", err.Error())
 		os.Exit(1)
 	}
-	fmt.Println(encrypted)
+	fmt.Printf("%s", encrypted)
 }

@@ -14,6 +14,7 @@ RUN apk add --update --no-cache \
     less \
     make \
     openssl \
+    openssh-keygen \
     shellcheck \
     util-linux
 
@@ -86,7 +87,14 @@ secretshare-all:
     COPY +secretshare-darwin/secretshare ./secretshare-darwin-amd64
     SAVE ARTIFACT ./*
 
+test:
+    COPY +secretshare-linux/secretshare ./secretshare
+    RUN ./secretshare
+    RUN bash -c "echo -n hello | openssl pkeyutl -encrypt -pubin -inkey <(ssh-keygen -f ~/.secretshare.pub -e -m PKCS8) -pkeyopt rsa_padding_mode:oaep -pkeyopt rsa_oaep_md:sha256 -pkeyopt rsa_mgf1_md:sha256 | base64 | ./secretshare decrypt > output"
+    RUN bash -c "diff output <( echo -n hello)"
+
 release:
+    BUILD +test
     FROM node:13.10.1-alpine3.11
     RUN npm install -g github-release-cli@v1.3.1
     WORKDIR /release

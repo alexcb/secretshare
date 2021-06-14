@@ -324,5 +324,5 @@ func main() {
 		fmt.Fprintf(os.Stderr, "failed while encrypting: %s", err.Error())
 		os.Exit(1)
 	}
-	fmt.Printf("%s", encrypted)
+	fmt.Printf("%s\n", encrypted)
 }

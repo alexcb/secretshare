@@ -73,6 +73,9 @@ func encryptAES256(data []byte) ([]byte, []byte, error) {
 	}
 	plaintext := buf.Bytes()
 
+	sum := sha256.Sum256(plaintext)
+	plaintext = append(sum[:], plaintext...)
+
 	block, err := aes.NewCipher(key)
 	if err != nil {
 		return nil, nil, err
@@ -86,7 +89,6 @@ func encryptAES256(data []byte) ([]byte, []byte, error) {
 
 	mode := cipher.NewCBCEncrypter(block, iv)
 	mode.CryptBlocks(ciphertext[aes.BlockSize:], plaintext)
-
 	return key, ciphertext, nil
 }
 
@@ -111,7 +113,13 @@ func decryptAES(key, ciphertext []byte) ([]byte, error) {
 	// works inplace when both args are the same
 	mode.CryptBlocks(ciphertext, ciphertext)
 
-	buf := bytes.NewReader(ciphertext)
+	expectedSum := ciphertext[:32]
+	actualSum := sha256.Sum256(ciphertext[32:])
+	if !bytes.Equal(expectedSum, actualSum[:]) {
+		return nil, fmt.Errorf("sha256 mismatch %v vs %v", expectedSum, actualSum)
+	}
+
+	buf := bytes.NewReader(ciphertext[32:])
 	var n uint64
 	if err = binary.Read(buf, binary.LittleEndian, &n); err != nil {
 		return nil, err

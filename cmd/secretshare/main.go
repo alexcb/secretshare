@@ -221,19 +221,23 @@ func test() {
 	}
 	pub = strings.TrimPrefix(pub, "ssh-rsa ")
 
-	data := []byte("hello test")
-	encrypted, err := encrypt(data, []byte("ssh-rsa "+pub))
-	if err != nil {
-		panic(err)
-	}
+	for _, data := range [][]byte{
+		[]byte("hello test"),
+		[]byte("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"),
+	} {
+		encrypted, err := encrypt(data, []byte("ssh-rsa "+pub))
+		if err != nil {
+			panic(err)
+		}
 
-	data2, err := decrypt(encrypted, priv)
-	if err != nil {
-		panic(err)
-	}
+		data2, err := decrypt(encrypted, priv)
+		if err != nil {
+			panic(err)
+		}
 
-	if !bytes.Equal(data, data2) {
-		panic("missmatch")
+		if !bytes.Equal(data, data2) {
+			panic("missmatch")
+		}
 	}
 }
 

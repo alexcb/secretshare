@@ -53,6 +53,7 @@ lint:
 
 secretshare:
     FROM +code
+    ARG RELEASE_TAG="dev"
     ARG GOOS
     ARG GO_EXTRA_LDFLAGS
     ARG GOARCH
@@ -62,7 +63,7 @@ secretshare:
     RUN --mount=type=cache,target=$GOCACHE \
         go build \
             -o build/secretshare \
-            -ldflags "$GO_EXTRA_LDFLAGS" \
+            -ldflags "-X main.Version=$RELEASE_TAG $GO_EXTRA_LDFLAGS" \
             cmd/secretshare/main.go
     SAVE ARTIFACT build/secretshare AS LOCAL "build/$GOOS/$GOARCH/secretshare"
 

@@ -20,6 +20,8 @@ import (
 	"golang.org/x/crypto/ssh"
 )
 
+var Version = "development"
+
 func marshalRSAPrivate(priv *rsa.PrivateKey) string {
 	return string(pem.EncodeToMemory(&pem.Block{
 		Type: "RSA PRIVATE KEY", Bytes: x509.MarshalPKCS1PrivateKey(priv),
@@ -294,6 +296,19 @@ func genOrLoadKeys() (string, string, error) {
 }
 
 func main() {
+	var arg string
+	if len(os.Args) == 2 {
+		arg = os.Args[1]
+	}
+	if len(os.Args) > 2 {
+		fmt.Fprintf(os.Stderr, "only a single arg is supported\n")
+		os.Exit(1)
+	}
+	if arg == "-v" || arg == "--version" {
+		fmt.Printf("secretshare version: %s\n", Version)
+		return
+	}
+
 	test()
 	pub, priv, err := genOrLoadKeys()
 	if err != nil {
@@ -313,15 +328,13 @@ func main() {
 		return
 	}
 
-	arg := os.Args[1]
-
 	data, err := ioutil.ReadAll(os.Stdin)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "failed while reading from stdin: %s\n", err.Error())
 		os.Exit(1)
 	}
 
-	if arg == "decrypt" {
+	if arg == "decrypt" || arg == "--decrypt" || arg == "-d" || arg == "d" {
 		data2, err := decrypt(string(data), priv)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "failed while decrypting: %s\n", err.Error())

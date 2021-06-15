@@ -14,9 +14,11 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"path"
 	"path/filepath"
 	"strings"
 
+	flags "github.com/jessevdk/go-flags"
 	"golang.org/x/crypto/ssh"
 )
 
@@ -135,6 +137,7 @@ func decryptAES(key, ciphertext []byte) ([]byte, error) {
 }
 
 func encrypt(msg, publicKey []byte) (string, error) {
+	logger("parsing public key")
 	parsed, _, _, _, err := ssh.ParseAuthorizedKey(publicKey)
 	if err != nil {
 		return "", err
@@ -150,6 +153,7 @@ func encrypt(msg, publicKey []byte) (string, error) {
 	pub := pubCrypto.(*rsa.PublicKey)
 
 	if len(msg) <= 256 {
+		logger("encrypting with OAEP only")
 		// msg is small enough to only use OAEP encryption; this will result in less bytes to transfer.
 		encryptedBytes, err := rsa.EncryptOAEP(
 			sha256.New(),
@@ -166,6 +170,7 @@ func encrypt(msg, publicKey []byte) (string, error) {
 		return base64.StdEncoding.EncodeToString(encryptedBytes), nil
 	}
 
+	logger("encrypting with OAEP+AES256")
 	// otherwise, encrypt using AES256
 
 	key, ciphertext, err := encryptAES256(msg)
@@ -212,6 +217,7 @@ func decrypt(data, priv string) ([]byte, error) {
 	}
 
 	if len(aesData) == 0 {
+		logger("decrypted OAEP only")
 		return payload, nil
 	}
 
@@ -221,6 +227,7 @@ func decrypt(data, priv string) ([]byte, error) {
 		return nil, err
 	}
 
+	logger("decrypted OAEP+AES256")
 	return decrypted, nil
 }
 
@@ -295,46 +302,78 @@ func genOrLoadKeys() (string, string, error) {
 	return string(pub), string(priv), nil
 }
 
+type opts struct {
+	Verbose bool `long:"verbose" short:"v" description:"Enable verbose logging"`
+	Version bool `long:"version" short:"V" description:"Print version and exit"`
+}
+
+var loggerEnabled bool
+
+func logger(msg string, args ...interface{}) {
+	if loggerEnabled {
+		fmt.Fprintf(os.Stderr, msg+"\n", args...)
+	}
+}
+
 func main() {
-	var arg string
-	if len(os.Args) == 2 {
-		arg = os.Args[1]
-	}
-	if len(os.Args) > 2 {
-		fmt.Fprintf(os.Stderr, "only a single arg is supported\n")
-		os.Exit(1)
-	}
-	if arg == "-v" || arg == "--version" {
-		fmt.Printf("secretshare version: %s\n", Version)
-		return
+	test()
+
+	programName := "secretshare"
+	if len(os.Args) > 0 {
+		programName = path.Base(os.Args[0])
 	}
 
-	test()
+	progOpts := opts{}
+	p := flags.NewNamedParser("", flags.PrintErrors|flags.PassDoubleDash|flags.PassAfterNonOption|flags.HelpFlag)
+	_, err := p.AddGroup(fmt.Sprintf("%s [options] args", programName), "", &progOpts)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "%s", err.Error())
+		os.Exit(1)
+	}
+	args, err := p.ParseArgs(os.Args[1:])
+	if err != nil {
+		p.WriteHelp(os.Stderr)
+		os.Exit(1)
+	}
+	loggerEnabled = progOpts.Verbose
+
 	pub, priv, err := genOrLoadKeys()
 	if err != nil {
 		panic(err)
 	}
 	pub = strings.TrimPrefix(pub, "ssh-rsa ")
 
-	if len(os.Args) <= 1 {
-		appName := "secret-share"
-		if len(os.Args) > 0 {
-			appName = os.Args[0]
+	var data []byte
+	fi, _ := os.Stdin.Stat()
+	if (fi.Mode() & os.ModeCharDevice) == 0 {
+		data, err = ioutil.ReadAll(os.Stdin)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "failed while reading from stdin: %s\n", err.Error())
+			os.Exit(1)
 		}
-		fmt.Printf("To decrypt data, run: %s decrypt < file_to_decrypt\n", appName)
-		fmt.Printf("To encrypt data, run: %s <encryption_key> < data_to_encrypt\n", appName)
+	}
+
+	mode := "help"
+	var pubKey string
+	if len(data) > 0 {
+		if len(args) == 0 {
+			mode = "decrypt"
+		} else if len(args) == 1 {
+			mode = "encrypt"
+			pubKey = args[0]
+		}
+	}
+
+	if mode == "help" {
+		fmt.Printf("To decrypt data, run: %s < file_to_decrypt\n", programName)
+		fmt.Printf("To encrypt data, run: %s <encryption_key> < data_to_encrypt\n", programName)
 		fmt.Printf("\n")
-		fmt.Printf("For example if someone wanted to send you data, they would run:\n%s %s < data_to_encrypt\n", appName, pub)
+		fmt.Printf("For example if someone wanted to send you data, they would run:\n%s %s < data_to_encrypt\n", programName, pub)
 		return
 	}
 
-	data, err := ioutil.ReadAll(os.Stdin)
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "failed while reading from stdin: %s\n", err.Error())
-		os.Exit(1)
-	}
-
-	if arg == "decrypt" || arg == "--decrypt" || arg == "-d" || arg == "d" {
+	if mode == "decrypt" {
+		logger("decrypting %d bytes", len(data))
 		data2, err := decrypt(string(data), priv)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "failed while decrypting: %s\n", err.Error())
@@ -344,7 +383,12 @@ func main() {
 		return
 	}
 
-	encrypted, err := encrypt(data, []byte("ssh-rsa "+arg))
+	if mode != "encrypt" {
+		panic("shouldnt happen")
+	}
+
+	logger("encrypting %d bytes", len(data))
+	encrypted, err := encrypt(data, []byte("ssh-rsa "+pubKey))
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "failed while encrypting: %s", err.Error())
 		os.Exit(1)

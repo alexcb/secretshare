@@ -30,7 +30,7 @@ This will output something like
 
 Alice can then safely send this data back to you, and only you can decrypt it, but running this command:
 
-    echo "gevonaUXKj7Wmct65A8yVJWTp9D/sd6YbOCi4BtrKGeUjdWs/fa0BbP0IQhdP2j4fS6n12zGmgkOXHLJyJnG9OPxZ+EaPcIfVBs5TfvNnC/8Dfu+V5ScRIYXBHVjRsDOBQCYzeOSwFvq1vUyuq20Wr7s3szbgFkDttxPsaXMKyxTcVEqkgSp09dhV7roqBmsRUDbAFpIWLIUb4ZAtCfU6rbWaAes9acSmMT3fvW/no1gsa3/Wobdpj3T7WVrQsj+upr2ANlFyA3Bt7IOKxmJhrrRYOBxAkk6NEnYmrHWR26KGRhz/VRPxAZWsB/qMoVAw5ukjnVple2+x8SMrIE9Gg==" | secretshare decrypt
+    echo "gevonaUXKj7Wmct65A8yVJWTp9D/sd6YbOCi4BtrKGeUjdWs/fa0BbP0IQhdP2j4fS6n12zGmgkOXHLJyJnG9OPxZ+EaPcIfVBs5TfvNnC/8Dfu+V5ScRIYXBHVjRsDOBQCYzeOSwFvq1vUyuq20Wr7s3szbgFkDttxPsaXMKyxTcVEqkgSp09dhV7roqBmsRUDbAFpIWLIUb4ZAtCfU6rbWaAes9acSmMT3fvW/no1gsa3/Wobdpj3T7WVrQsj+upr2ANlFyA3Bt7IOKxmJhrrRYOBxAkk6NEnYmrHWR26KGRhz/VRPxAZWsB/qMoVAw5ukjnVple2+x8SMrIE9Gg==" | secretshare
 
 Which will output the original message:
 
@@ -46,9 +46,9 @@ Under the hood `secretshare` will generate a private and public key stored under
 ## Building from Source
 
 secretshare makes use of the [Earthly](https://www.earthly.dev/) build system. To build from source,
-first download the [earth](https://github.com/earthly/earthly) command, then run:
+first download the [earthly](https://github.com/earthly/earthly) command, then run:
 
-    earth +secretshare-all
+    earthly +secretshare-all
 
 which will produce binary files under `./build/<platform>/amd64/secretshare`
 
@@ -56,7 +56,7 @@ which will produce binary files under `./build/<platform>/amd64/secretshare`
 
 To release a new version, run the following command:
 
-    RELEASE_TAG=v0.0.2 earth --build-arg RELEASE_TAG --secret GITHUB_TOKEN --push +release
+    RELEASE_TAG=v0.0.2 earthly --build-arg RELEASE_TAG --secret GITHUB_TOKEN --push +release
 
 ### Preview
 

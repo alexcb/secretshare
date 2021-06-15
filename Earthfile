@@ -91,7 +91,7 @@ secretshare-all:
 test:
     COPY +secretshare-linux/secretshare ./secretshare
     RUN ./secretshare
-    RUN bash -c "echo -n hello | openssl pkeyutl -encrypt -pubin -inkey <(ssh-keygen -f ~/.secretshare.pub -e -m PKCS8) -pkeyopt rsa_padding_mode:oaep -pkeyopt rsa_oaep_md:sha256 -pkeyopt rsa_mgf1_md:sha256 | base64 | ./secretshare decrypt > output"
+    RUN bash -c "echo -n hello | openssl pkeyutl -encrypt -pubin -inkey <(ssh-keygen -f ~/.secretshare.pub -e -m PKCS8) -pkeyopt rsa_padding_mode:oaep -pkeyopt rsa_oaep_md:sha256 -pkeyopt rsa_mgf1_md:sha256 | base64 | ./secretshare > output"
     RUN bash -c "diff output <( echo -n hello)"
 
 release:

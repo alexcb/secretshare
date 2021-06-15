@@ -31,6 +31,7 @@ Alice will then run:
     echo 'Hi Bob, your new password is "querty".' | secretshare AAAAB3NzaC1yc2EAAAADAQABAAABAQCagdQYuPXgzyfg2k58CYTntkSo2rI9QtZWYnk45n6oZGW8wGUoqrmCeLCbCo7HG6JJD+jUuWx9ELmC2rRINQnhJdBdwbMlOx8v7oSr60xR8b0pYRL1gm6DseU0u/pClBfGcwV7tsxuRspk/c3/cpYOFcs2vN5mXo29qSpg1w4iE3snoAOQGajN1U4sT3rht5hjx188d9MxuBTnqd0yW7RQMSS8YqdszaAiwUQ2rtwMKDUp5CT+5LZ/QW/EMexRSEfgkjGGmz+NlBAhGDTrBByw2Dl+6pZESAtxmCaZ6vzG+CSqH5oQVXVl/A9YEQiuDVGdxcfF3jYmlYIfISeMtRTj
 
 Which will output an encrypted message:
+
     gevonaUXKj7Wmct65A8yVJWTp9D/sd6YbOCi4BtrKGeUjdWs/fa0BbP0IQhdP2j4fS6n12zGmgkOXHLJyJnG9OPxZ+EaPcIfVBs5TfvNnC/8Dfu+V5ScRIYXBHVjRsDOBQCYzeOSwFvq1vUyuq20Wr7s3szbgFkDttxPsaXMKyxTcVEqkgSp09dhV7roqBmsRUDbAFpIWLIUb4ZAtCfU6rbWaAes9acSmMT3fvW/no1gsa3/Wobdpj3T7WVrQsj+upr2ANlFyA3Bt7IOKxmJhrrRYOBxAkk6NEnYmrHWR26KGRhz/VRPxAZWsB/qMoVAw5ukjnVple2+x8SMrIE9Gg==
 
 Alice can then safely send this data back to Bob, who can decrypt it by running:

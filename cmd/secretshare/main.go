@@ -337,6 +337,11 @@ func main() {
 	}
 	loggerEnabled = progOpts.Verbose
 
+	if progOpts.Version {
+		fmt.Printf("secretshare version: %s\n", Version)
+		os.Exit(0)
+	}
+
 	pub, priv, err := genOrLoadKeys()
 	if err != nil {
 		panic(err)

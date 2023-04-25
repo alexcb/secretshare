@@ -2,13 +2,21 @@
 
 ## Installation
 
-### Linux
+### Linux-amd64 (e.g. intel)
 
     sudo /bin/sh -c 'wget https://github.com/alexcb/secretshare/releases/latest/download/secretshare-linux-amd64 -O /usr/local/bin/secretshare && chmod +x /usr/local/bin/secretshare'
 
-### MacOS
+### Linux-arm64 (e.g. raspberry pi v4)
+
+    sudo /bin/sh -c 'wget https://github.com/alexcb/secretshare/releases/latest/download/secretshare-linux-arm64 -O /usr/local/bin/secretshare && chmod +x /usr/local/bin/secretshare'
+
+### MacOS-amd64 (e.g. intel)
 
     sudo /bin/sh -c 'wget https://github.com/alexcb/secretshare/releases/latest/download/secretshare-darwin-amd64 -O /usr/local/bin/secretshare && chmod +x /usr/local/bin/secretshare'
+
+### MacOS-arm64 (e.g. M1/M2)
+
+    sudo /bin/sh -c 'wget https://github.com/alexcb/secretshare/releases/latest/download/secretshare-darwin-arm64 -O /usr/local/bin/secretshare && chmod +x /usr/local/bin/secretshare'
 
 ### Usage
 

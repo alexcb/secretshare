@@ -16,7 +16,7 @@ Suppose Bob wants to receive some data from Alice, first Bob must run `secretsha
 
     secretshare
 
-This will generate a new public/private key, and will then print out a help containing Bob's public key:
+This will generate a new public/private key, and will then print out a help message containing Bob's public key:
 
     To decrypt data, run: secretshare < file_to_decrypt
     To encrypt data, run: secretshare <encryption_key> < data_to_encrypt

@@ -93,7 +93,7 @@ secretshare-all:
 
 
 test:
-    COPY +secretshare-linux/secretshare ./secretshare
+    COPY +secretshare-linux-amd64/secretshare ./secretshare
     RUN ./secretshare
     RUN bash -c "echo -n hello | openssl pkeyutl -encrypt -pubin -inkey <(ssh-keygen -f ~/.secretshare.pub -e -m PKCS8) -pkeyopt rsa_padding_mode:oaep -pkeyopt rsa_oaep_md:sha256 -pkeyopt rsa_mgf1_md:sha256 | base64 | ./secretshare > output"
     RUN bash -c "diff output <( echo -n hello)"
@@ -102,10 +102,17 @@ release:
     BUILD +test
     FROM node:13.10.1-alpine3.11
     RUN npm install -g github-release-cli@v1.3.1
+    RUN apk add file
     WORKDIR /release
-    COPY +secretshare-linux/secretshare ./secretshare-linux-amd64
-    COPY +secretshare-darwin/secretshare ./secretshare-darwin-amd64
-    ARG RELEASE_TAG
+    COPY +secretshare-linux-amd64/secretshare ./secretshare-linux-amd64
+    COPY +secretshare-linux-arm64/secretshare ./secretshare-linux-arm64
+    COPY +secretshare-darwin-amd64/secretshare ./secretshare-darwin-amd64
+    COPY +secretshare-darwin-arm64/secretshare ./secretshare-darwin-arm64
+    RUN file secretshare-linux-amd64 | grep "ELF 64-bit LSB executable, x86-64"
+    RUN file secretshare-linux-arm64 | grep "ELF 64-bit LSB executable, ARM aarch64"
+    RUN file secretshare-darwin-amd64 | grep "Mach-O 64-bit x86_64 executable"
+    RUN file secretshare-darwin-arm64 | grep "Mach-O 64-bit arm64 executable"
+    ARG --required RELEASE_TAG
     ARG EARTHLY_GIT_HASH
     ARG BODY="No details provided"
     RUN --secret GITHUB_TOKEN=+secrets/GITHUB_TOKEN test -n "$GITHUB_TOKEN"

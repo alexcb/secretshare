@@ -1,4 +1,5 @@
-FROM golang:1.13-alpine3.11
+VERSION 0.7
+FROM golang:1.20-alpine3.17
 
 RUN apk add --update --no-cache \
     bash \
@@ -18,38 +19,23 @@ RUN apk add --update --no-cache \
     shellcheck \
     util-linux
 
+
+
 WORKDIR /secretshare
 
 deps:
-    RUN go get golang.org/x/tools/cmd/goimports
-    RUN go get golang.org/x/lint/golint
+    RUN curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v1.50.0
     COPY go.mod go.sum .
-	RUN go mod download
-    SAVE IMAGE
+    RUN go mod download
 
 code:
     FROM +deps
     COPY --dir cmd ./
-    SAVE IMAGE
 
 lint:
     FROM +code
-    RUN output="$(ineffassign .)" ; \
-        if [ -n "$output" ]; then \
-            echo "$output" ; \
-            exit 1 ; \
-        fi
-    RUN output="$(goimports -d $(find . -type f -name '*.go' | grep -v \.pb\.go) 2>&1)"  ; \
-        if [ -n "$output" ]; then \
-            echo "$output" ; \
-            exit 1 ; \
-        fi
-    RUN golint -set_exit_status ./...
-    RUN output="$(go vet ./... 2>&1)" ; \
-        if [ -n "$output" ]; then \
-            echo "$output" ; \
-            exit 1 ; \
-        fi
+    COPY ./.golangci.yaml ./
+    RUN golangci-lint run
 
 secretshare:
     FROM +code
@@ -67,26 +53,44 @@ secretshare:
             cmd/secretshare/main.go
     SAVE ARTIFACT build/secretshare AS LOCAL "build/$GOOS/$GOARCH/secretshare"
 
-secretshare-darwin:
+secretshare-darwin-amd64:
     COPY \
         --build-arg GOOS=darwin \
         --build-arg GOARCH=amd64 \
         --build-arg GO_EXTRA_LDFLAGS= \
-        +secretshare/* ./
-    SAVE ARTIFACT ./*
+        +secretshare/secretshare /build/secretshare
+    SAVE ARTIFACT /build/secretshare AS LOCAL "build/darwin/amd64/secretshare"
 
-secretshare-linux:
+secretshare-darwin-arm64:
+    COPY \
+        --build-arg GOOS=darwin \
+        --build-arg GOARCH=arm64 \
+        --build-arg GO_EXTRA_LDFLAGS= \
+        +secretshare/secretshare /build/secretshare
+    SAVE ARTIFACT /build/secretshare AS LOCAL "build/darwin/arm64/secretshare"
+
+secretshare-linux-amd64:
     COPY \
         --build-arg GOOS=linux \
         --build-arg GOARCH=amd64 \
         --build-arg GO_EXTRA_LDFLAGS="-linkmode external -extldflags -static" \
-        +secretshare/* ./
-    SAVE ARTIFACT ./*
+        +secretshare/secretshare /build/secretshare
+    SAVE ARTIFACT /build/secretshare AS LOCAL "build/linux/amd64/secretshare"
+
+secretshare-linux-arm64:
+    COPY \
+        --build-arg GOOS=linux \
+        --build-arg GOARCH=arm64 \
+        --build-arg GO_EXTRA_LDFLAGS= \
+        +secretshare/secretshare /build/secretshare
+    SAVE ARTIFACT /build/secretshare AS LOCAL "build/linux/arm64/secretshare"
 
 secretshare-all:
-    COPY +secretshare-linux/secretshare ./secretshare-linux-amd64
-    COPY +secretshare-darwin/secretshare ./secretshare-darwin-amd64
-    SAVE ARTIFACT ./*
+    BUILD +secretshare-linux-amd64
+    BUILD +secretshare-linux-arm64
+    BUILD +secretshare-darwin-amd64
+    BUILD +secretshare-darwin-arm64
+
 
 test:
     COPY +secretshare-linux/secretshare ./secretshare
